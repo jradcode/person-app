@@ -1,37 +1,25 @@
-const express = require('express');
-const cors = require('cors');
 require('dotenv').config();
-const pool = require('./db'); 
+const express = require('express');
+const cors = require('cors'); // Essential for GitHub Pages later
+const db = require('./db');
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Angular 19 often runs on port 4200, so we allow that origin
-app.use(cors({ origin: 'http://localhost:4200' }));
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// GET all persons
-app.get('/api/persons', async (req, res) => {
+// Routes
+app.get('/test-db', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM persons ORDER BY id DESC');
-        res.json(result.rows);
+        const result = await db.query('SELECT NOW()');
+        res.json({ status: "Connected", time: result.rows[0].now });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// POST a new person
-app.post('/api/persons', async (req, res) => {
-    const { name, email } = req.body;
-    try {
-        const result = await pool.query(
-            'INSERT INTO persons (name, email) VALUES ($1, $2) RETURNING *',
-            [name, email]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+app.listen(PORT, () => {
+    console.log(`🚀 Server ready at http://localhost:${PORT}`);
 });
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
