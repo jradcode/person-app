@@ -4,6 +4,7 @@
 	  <h5 class="mb-2 text-2xl font-bold tracking-tight text-center text-gray-900 dark:text-white">{{person.fullName}}</h5>
 	  <p class="font-normal text-gray-700 dark:text-gray-400 text-center mb-4"> Age: {{person.age}}</p>   
 		<div class="flex justify-center">
+			<button (click)="onEdit(person.id)">Edit</button>
 	    <button (click)="removeTag(person.id)" class="bg-red-500 hover:bg-red-900 text-white font-bold py-1 px-2 rounded text-center justify-center text-sm  transition duration-200 ease-in-out transform hover:scale-105">Remove</button>
 		</div> 
   </a>  
