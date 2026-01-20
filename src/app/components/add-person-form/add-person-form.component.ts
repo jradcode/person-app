@@ -4,6 +4,7 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 import { ApiService, PersonCreate } from '../../services/api.service';
 import { Person } from '../../models/person';
 import { CommonModule } from '@angular/common';
+import { ToastService } from '../../services/toast.service';
 //fix the edit and delete tag toasts
 //fix layout to center
 @Component({
@@ -17,12 +18,12 @@ export class AddPersonFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private apiService = inject(ApiService);
+  private toastService = inject(ToastService); // Inject it
 
   isEditMode = false;
   personId: number | null = null;
   isLoading = false;
-  toastMessage: string | null = null; // For the toast
-
+ 
   personForm = new FormGroup({
     fullName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     age: new FormControl<number | null>(null, [Validators.required, Validators.min(1)])
@@ -57,50 +58,38 @@ export class AddPersonFormComponent implements OnInit {
   }
 }
 
-  submitForm() {
-    if (this.personForm.invalid) return;
+ // add-person-form.component.ts
+submitForm() {
+  if (this.personForm.invalid) return;
 
-    this.isLoading = true;
-    const rawValues = this.personForm.getRawValue();
-    const personData = {
-      fullName: rawValues.fullName,
-      age: Number(rawValues.age)
-    };
+  this.isLoading = true;
+  const rawValues = this.personForm.getRawValue();
+  const personData = { fullName: rawValues.fullName, age: Number(rawValues.age) };
 
-    if (this.isEditMode && this.personId !== null) {
-      // EDIT MODE
-      const personToEdit: Person = { ...personData, id: this.personId };
-      console.log('Submitting Update:', personToEdit);
-      
-      this.apiService.editPerson(personToEdit).subscribe({
-        next: () => this.handleSuccess('Successfully Updated!'),
-        error: (err) => this.handleError(err)
-      });
-    } else {
-      // ADD MODE
-      this.apiService.addPerson(personData as PersonCreate).subscribe({
-        next: () => this.handleSuccess('Successfully Added!'),
-        error: (err) => this.handleError(err)
-      });
-    }
-  }
-
-  private handleSuccess(message: string) {
-    this.isLoading = false;
-    this.toastMessage = message;
-    console.log('Success Toast Triggered:', message);
+  if (this.isEditMode && this.personId !== null) {
+    const personToEdit: Person = { ...personData, id: this.personId };
     
-    setTimeout(() => {
-      this.toastMessage = null;
-      this.router.navigate(['/']);
-    }, 2000);
+    this.apiService.editPerson(personToEdit).subscribe({
+      next: () => {
+        this.toastService.show('Successfully Updated!'); // Use service
+        this.router.navigate(['/']); // Redirect immediately
+      },
+      error: (err) => {
+        this.toastService.show('Update failed', 'error');
+        this.isLoading = false;
+      }
+    });
+  } else {
+    // ADD MODE logic...
+    this.apiService.addPerson(personData as PersonCreate).subscribe({
+      next: () => {
+        this.toastService.show('Successfully Added!');
+        this.router.navigate(['/']);
+      }
+    });
   }
-
-  private handleError(err: any) {
-    this.isLoading = false;
-    console.error('API Error:', err);
-  }
-
+}
+  
   cancel() {
     this.router.navigate(['/']);
   }

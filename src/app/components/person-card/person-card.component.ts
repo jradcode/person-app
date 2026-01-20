@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core'; // Added OnInit
 import { Person } from '../../models/person';
 import { CommonModule } from '@angular/common'; 
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { ToastService } from '../../services/toast.service'; // 1. Import the Service
 
 @Component({
   selector: 'app-person-card',
@@ -11,54 +12,42 @@ import { ApiService } from '../../services/api.service';
   templateUrl: './person-card.component.html',
   styleUrl: './person-card.component.css'
 })
-export class PersonCardComponent {
-  personList: Person[] = [];
-  toastMessage: string | null = null;
-  //apiService: ApiService = inject(ApiService);
-  //person: Person[] = PERSON;
+export class PersonCardComponent implements OnInit {
+  private apiService = inject(ApiService);
+  private toast = inject(ToastService); //Inject the Global Toast Service
+  private router = inject(Router);
 
-  constructor(private apiService: ApiService = inject(ApiService)) {}
-  router = inject(Router);
+  personList: Person[] = [];
 
   ngOnInit(): void {
     this.onGetAllPersons();
   }
   
   onGetAllPersons(): void {
-    this.apiService.getAllPersons().subscribe(
-      (res) => this.personList = res,
-      (error: any) => console.log(error),
-      () => console.log("Done getting the persons!"),
-    );
+    this.apiService.getAllPersons().subscribe({
+      next: (res) => this.personList = res,
+      error: (err) => console.error(err)
+    });
   }
 
   removeTag(personId: number): void {
-    this.apiService.deletePerson(personId).subscribe(
-      (success) => {
-        if (success) {
-          this.personList = this.personList.filter(person => person.id !== personId);
-          console.log(`Person with Id ${personId} removed successfully.`);
-          this.showToast('Nametag Removed!');
-          this.router.navigate(['/']);
-        }
+    this.apiService.deletePerson(personId).subscribe({
+      next: () => {
+        this.personList = this.personList.filter(person => person.id !== personId);
+        
+        this.toast.show('Nametag Removed!', 'error'); 
+        console.log(`Person with Id ${personId} removed.`);
       },
-      (error: any) => console.log("Error removing person: ", error)
-    );
+      error: (err) => {
+        console.error("Error removing person: ", err);
+        this.toast.show('Delete failed', 'error');
+      }
+    });
   }
-  editTag(personId: number): void {
-    // 1. Trigger the toast first
-    this.showToast('Opening Edit Form...');
 
-    // 2. Delay the navigation slightly so the toast is visible
-    setTimeout(() => {
-      this.router.navigate(['/details', personId]);
-    }, 500);
-  }
-// Helper method to handle the toast timing
-  private showToast(message: string) {
-    this.toastMessage = message;
-    setTimeout(() => {
-      this.toastMessage = null;
-    }, 2500);
+  editTag(personId: number): void {
+    // The Global Toast stays visible even after the page changes.
+    this.toast.show('Opening Edit Form...', 'success');
+    this.router.navigate(['/details', personId]);
   }
 }
