@@ -1,79 +1,107 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
-//import { PERSON } from '../../models/person-data';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ApiService, PersonCreate } from '../../services/api.service';
 import { Person } from '../../models/person';
-import { ApiService } from '../../services/api.service';
-// to pass fullName, age data via prop/service into the form
+import { CommonModule } from '@angular/common';
+//fix the edit and delete tag toasts
+//fix layout to center
 @Component({
   selector: 'app-person-form',
+  standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './add-person-form.component.html',
-  styleUrl: './add-person-form.component.css'
+  styleUrls: ['./add-person-form.component.css']
 })
-export class AddPersonFormComponent {
-  fb = inject(FormBuilder);
-  apiService = inject(ApiService);
-  router = inject(Router);
-   
+export class AddPersonFormComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private apiService = inject(ApiService);
 
-  //FormBuilder way - shorter
-  personForm = this.fb.group({
-    id: ["0"],
-    fullName: ["", Validators.required],
-    age: ["", [Validators.required, Validators.pattern("^[0-9]*$"), Validators.maxLength(3)]]
+  isEditMode = false;
+  personId: number | null = null;
+  isLoading = false;
+  toastMessage: string | null = null; // For the toast
+
+  personForm = new FormGroup({
+    fullName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    age: new FormControl<number | null>(null, [Validators.required, Validators.min(1)])
   });
-/*
-  onAddPerson(): void {
-    this.apiService.addPerson(this.person).subscribe(
-      (res) => console.log(res),
-      (error: any) => console.log(error),
-      () => console.log("Done creating user!")
-    );
+
+ ngOnInit() {
+  const idParam = this.route.snapshot.paramMap.get('id');
+
+  if (idParam) {
+    const id = Number(idParam);
+    this.isEditMode = true;
+    this.personId = id;
+    this.isLoading = true;
+
+    this.apiService.getPerson(id).subscribe({
+      next: (data: any) => {
+        console.log("RAW DATA FROM NEON:", data); 
+
+        // This covers all common naming conventions
+        this.personForm.patchValue({
+          fullName: data.fullName || data.full_name || data.fullname || '',
+          age: data.age !== undefined ? data.age : null
+        });
+
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error("API Error:", err);
+        this.isLoading = false;
+      }
+    });
   }
-*/
- 
-  
-/*  //normal reactive forms way
-  personForm: FormGroup = new FormGroup({
-    fullName: new FormControl("", Validators.required),
-    age: new FormControl("", Validators.required)
-  })
-*/
-
-ngOnInit() {
-  this.apiService.getAllPersons().subscribe(persons => {
-    const latestId: number = persons.reduce((max, person) => parseInt(person.id) > max ? parseInt(person.id) : max, 0);
-    this.personForm.patchValue({ id: (latestId + 1).toString() });
-  });
 }
 
-  
-  
   submitForm() {
-    if (this.personForm.valid) {
-    //need to add a id to be a Person type
-      const person: Person = {
-        id: String(this.personForm.get('id')?.value),
-        fullName: String(this.personForm.get('fullName')?.value),
-        age: Number(this.personForm.get('age')?.value)
-      };
+    if (this.personForm.invalid) return;
 
-      this.apiService.addPerson(person).subscribe(
-        res => {
-          console.log(" Added person Success!", res);
-          this.router.navigate(['/']);
-        },
-        error => console.error("Error! Not added.", error)
-      );
+    this.isLoading = true;
+    const rawValues = this.personForm.getRawValue();
+    const personData = {
+      fullName: rawValues.fullName,
+      age: Number(rawValues.age)
+    };
+
+    if (this.isEditMode && this.personId !== null) {
+      // EDIT MODE
+      const personToEdit: Person = { ...personData, id: this.personId };
+      console.log('Submitting Update:', personToEdit);
+      
+      this.apiService.editPerson(personToEdit).subscribe({
+        next: () => this.handleSuccess('Successfully Updated!'),
+        error: (err) => this.handleError(err)
+      });
     } else {
-      console.log("Form is invalid!. Not added.");
+      // ADD MODE
+      this.apiService.addPerson(personData as PersonCreate).subscribe({
+        next: () => this.handleSuccess('Successfully Added!'),
+        error: (err) => this.handleError(err)
+      });
     }
-  }   
-}  
+  }
+
+  private handleSuccess(message: string) {
+    this.isLoading = false;
+    this.toastMessage = message;
+    console.log('Success Toast Triggered:', message);
     
-    
+    setTimeout(() => {
+      this.toastMessage = null;
+      this.router.navigate(['/']);
+    }, 2000);
+  }
 
+  private handleError(err: any) {
+    this.isLoading = false;
+    console.error('API Error:', err);
+  }
 
-
+  cancel() {
+    this.router.navigate(['/']);
+  }
+}

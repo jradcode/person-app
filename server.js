@@ -24,6 +24,23 @@ app.get('/api/persons', async (req, res) => {
     }
 });
 
+app.get('/api/persons/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const person = await prisma.person.findUnique({
+            where: { id: parseInt(id) }
+        });
+
+        if (person) {
+            res.json(person);
+        } else {
+            res.status(404).json({ error: "Person not found" });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.post('/api/persons', async (req, res) => {
     try {
         const { fullName, age } = req.body;

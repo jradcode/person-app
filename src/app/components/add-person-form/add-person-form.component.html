@@ -1,35 +1,56 @@
 <div class="container py-10">
-	<h1 class="text-3xl font-bold text-center py-5">Add Nametag</h1>
-	<div class="flex justify-center items-center">
-		<form [formGroup]="personForm" (submit)="submitForm()" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xs border-4">
-			<label class="block text-gray-700 text-sm font-bold mb-2" for="fullName">
-				Full Name
-			</label>
-			<input formControlName="fullName" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="fullName" type="text" placeholder="Full Name"/>
-			@if(personForm.controls["fullName"].errors?.["required"] && personForm.controls["fullName"].touched) {
-				<div class="text-red-500 text-sm py-2 px-2 text-center">
-					<span>Full Name is required!</span>
-				</div>
-			}
+  <h1 class="text-3xl font-bold text-center py-5">
+    {{ isEditMode ? 'Edit Nametag' : 'Add Nametag' }}
+  </h1>
 
-			<label class="block text-gray-700 text-sm font-bold mb-2" for="age">
-				Age
-			</label>
-			<input  formControlName="age" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="age" type="number" placeholder="Age"/>
-			@if(personForm.controls["age"].errors?.["required"] && personForm.controls["age"].touched) {
-				<div class="text-red-500 text-sm py-2 px-2 text-center">
-					<span>Age is required!</span>
-				</div>
-			} <!--
-			<div *ngIf="personForm.get('age').errors?.maxLength">
-				<div class="text-red-500 text-sm py-2 px-2 text-center">
-					<span>Age can't be over 3 digits!</span>
-				</div>
-			</div>
-		-->
-			<div class="flex py-5 justify-center items-center">
-				<button [disabled]="!personForm.valid" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" type="submit">Add Nametag</button>
-			</div>
-		</form>
-	</div>
+  <div class="flex justify-center items-center">
+    @if (isEditMode && isLoading && !personForm.get('fullName')?.value) {
+      <div class="flex flex-col items-center gap-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <p>Fetching from Neon...</p>
+      </div>
+    } @else {
+      <form [formGroup]="personForm" (ngSubmit)="submitForm()" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xs border-4">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+          <input formControlName="fullName" type="text" class="shadow border rounded w-full py-2 px-3 text-gray-700" />
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+          <input formControlName="age" type="number" class="shadow border rounded w-full py-2 px-3 text-gray-700" />
+        </div>
+
+        <button [disabled]="personForm.invalid || isLoading" type="submit"
+          class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition">
+          {{ isLoading ? 'Processing...' : (isEditMode ? 'Save Changes' : 'Add Nametag') }}
+        </button>
+        
+        @if(isEditMode) {
+          <button type="button" (click)="cancel()" class="w-full mt-2 bg-gray-500 text-white py-2 px-4 rounded-full">
+            Cancel
+          </button>
+        }
+      </form>
+    }
+  </div>
 </div>
+
+@if (toastMessage) {
+  <div class="fixed bottom-10 right-10 z-50">
+    <div [class]="toastMessage.includes('Removed') ? 'bg-red-600 flex items-center gap-3 text-white px-8 py-4 rounded-xl shadow-2xl animate-bounce border-2 border-white/20' : 'bg-blue-600 flex items-center gap-3 text-white px-8 py-4 rounded-xl shadow-2xl animate-bounce border-2 border-white/20'">
+      
+      @if(toastMessage.includes('Removed')) {
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      } @else {
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+      }
+      
+      <span class="font-bold text-lg">{{ toastMessage }}</span>
+    </div>
+  </div>
+}
