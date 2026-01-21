@@ -1,37 +1,45 @@
-<div class="min-h-screen flex flex-col justify-center items-center py-10 bg-gray-50">
-  <h1 class="text-3xl font-bold text-center py-5">
-    {{ isEditMode ? 'Edit Nametag' : 'Add Nametag' }}
-  </h1>
+<div class="flex flex-col justify-start items-center min-h-[calc(100vh-160px)] bg-gray-50 px-4 pt-12">
+  
+  <div class="w-full max-w-xs">
+    <h1 class="text-3xl font-bold text-center py-3 text-slate-800">
+      {{ isEditMode ? 'Edit Nametag' : 'Add Nametag' }}
+    </h1>
 
-  <div class="flex justify-center items-center">
-    @if (isEditMode && isLoading && !personForm.get('fullName')?.value) {
-      <div class="flex flex-col items-center gap-4">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        <p>Fetching from Neon...</p>
-      </div>
-    } @else {
-      <form [formGroup]="personForm" (ngSubmit)="submitForm()" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-xs border-4">
-        <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
-          <input formControlName="fullName" type="text" class="shadow border rounded w-full py-2 px-3 text-gray-700" />
+    <div class="flex justify-center items-center">
+      @if (isEditMode && isLoading && !personForm.get('fullName')?.value) {
+        <div class="flex flex-col items-center gap-4 py-10">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          <p class="text-slate-600">Fetching from Neon...</p>
         </div>
+      } @else {
+        <form [formGroup]="personForm" (ngSubmit)="submitForm()" 
+              class="bg-white shadow-md rounded-xl px-8 pt-6 pb-8 mb-4 w-full border-4 border-slate-200">
+          
+          <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+            <input formControlName="fullName" type="text" 
+                   class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" />
+          </div>
 
-        <div class="mb-6">
-          <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
-          <input formControlName="age" type="number" class="shadow border rounded w-full py-2 px-3 text-gray-700" />
-        </div>
+          <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+            <input formControlName="age" type="number" 
+                   class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" />
+          </div>
 
-        <button [disabled]="personForm.invalid || isLoading" type="submit"
-          class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition">
-          {{ isLoading ? 'Processing...' : (isEditMode ? 'Save Changes' : 'Add Nametag') }}
-        </button>
-        
-        @if(isEditMode) {
-          <button type="button" (click)="cancel()" class="w-full mt-2 bg-gray-500 text-white py-2 px-4 rounded-full">
-            Cancel
-          </button>
-        }
-      </form>
-    }
+          <div class="flex flex-col gap-2">
+            <button [disabled]="personForm.invalid || isLoading" type="submit"
+              class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition shadow-lg">
+              {{ isLoading ? 'Processing...' : (isEditMode ? 'Save Changes' : 'Add Nametag') }}
+            </button>
+            
+            <button type="button" (click)="cancel()" 
+                    class="w-full bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full transition shadow">
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+    </div>
   </div>
 </div>
