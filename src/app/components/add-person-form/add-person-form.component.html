@@ -29,12 +29,12 @@
 
           <div class="flex flex-col gap-2">
             <button [disabled]="personForm.invalid || isLoading" type="submit"
-              class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition shadow-lg">
+              class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition shadow-lg">
               {{ isLoading ? 'Processing...' : (isEditMode ? 'Save Changes' : 'Add Nametag') }}
             </button>
             
             <button type="button" (click)="cancel()" 
-                    class="w-full bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full transition shadow">
+                    class="w-full bg-gray-500 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full transition shadow">
               Cancel
             </button>
           </div>
