@@ -1,14 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core'; // Added OnInit
 import { Person } from '../../models/person';
 import { CommonModule } from '@angular/common'; 
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service'; // 1. Import the Service
 
 @Component({
   selector: 'app-person-card',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule],
   templateUrl: './person-card.component.html',
   styleUrl: './person-card.component.css'
 })
@@ -34,9 +34,12 @@ export class PersonCardComponent implements OnInit {
     this.apiService.deletePerson(personId).subscribe({
       next: () => {
         this.personList = this.personList.filter(person => person.id !== personId);
-        
         this.toast.show('Nametag Removed!', 'error'); 
         console.log(`Person with Id ${personId} removed.`);
+        if (this.router.url.includes('details')) {
+          this.router.navigate(['/']);
+        }
+        
       },
       error: (err) => {
         console.error("Error removing person: ", err);

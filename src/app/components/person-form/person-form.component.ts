@@ -5,9 +5,11 @@ import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
 import { Person } from '../../models/person';
 import { ActivatedRoute } from '@angular/router';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-person-form',
+  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './person-form.component.html',
   styleUrl: './person-form.component.css'
@@ -19,8 +21,7 @@ export class PersonFormComponent {
   person: Person | undefined;
   personForm: FormGroup;
   router = inject(Router);
-
-  
+  toast = inject(ToastService);
 
   constructor(private apiService: ApiService = inject(ApiService)) {
     this.personForm = this.fb.group({
@@ -60,18 +61,20 @@ export class PersonFormComponent {
     if (this.personForm.valid && this.person) {
       const person: Person = {
         id: this.person.id,
-        fullName: String(this.personForm.get('fullName')?.value),
-        age: Number(this.personForm.get('age')?.value)
+        fullName: String(this.personForm.get("fullName")?.value),
+        age: Number(this.personForm.get("age")?.value)
       };
       this.apiService.editPerson(person).subscribe(
         res => {
-          console.log("Update Success!", res);
+          console.log('Update Success!', res);
+          this.toast.show('Nametag Updated!', 'success');
           this.router.navigate(['/']);
         },
         error => console.error("Error!", error)
       );
     } else {
       console.log("Form update failed!");
+      this.toast.show("Update Failed!', 'error");
     }
   }
 }
