@@ -1,4 +1,4 @@
-<div class="flex flex-col justify-start items-center min-h-[calc(100vh-160px)] bg-gray-50 px-4 pt-12">
+<div class="flex flex-col justify-center items-center min-h-[calc(100vh-160px)] bg-gray-50 px-4 pt-12">
   
   <div class="w-full max-w-xs">
     <h1 class="text-3xl font-bold text-center py-3 text-slate-800">
@@ -18,18 +18,38 @@
           <div class="mb-4">
             <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
             <input formControlName="fullName" type="text" 
-                   class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" />
+                   [class.border-red-500]="personForm.get('fullName')?.invalid && personForm.get('fullName')?.touched"
+                   class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" 
+                   placeholder="Enter full name..."/>
+            
+            @if (personForm.get('fullName')?.touched && personForm.get('fullName')?.errors) {
+              <div class="text-red-500 text-[10px] mt-1 italic">
+                @if (personForm.get('fullName')?.hasError('required')) { <span>Name is required.</span> }
+                @if (personForm.get('fullName')?.hasError('pattern')) { <span>Must start with a letter and contain no numbers and symbols.</span> }
+                @if (personForm.get('fullName')?.hasError('maxlength')) { <span>Limit 50 characters.</span> }
+              </div>
+            }
           </div>
 
           <div class="mb-6">
             <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
             <input formControlName="age" type="number" 
-                   class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" />
+                   [class.border-red-500]="personForm.get('age')?.invalid && personForm.get('age')?.touched"
+                   class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" 
+                   placeholder="Enter age..."/>
+            
+           @if (personForm.get('age')?.touched && personForm.get('age')?.errors) {
+            <div class="text-red-500 text-[10px] mt-1 italic">
+              @if (personForm.get('age')?.hasError('required')) { <span>Age is required.</span> }
+              @if (personForm.get('age')?.hasError('min')) { <span>Must be at least 1.</span> }
+              @if (personForm.get('age')?.hasError('max')) { <span>Age must be 135 or below.</span> }
+            </div>
+            }
           </div>
 
           <div class="flex flex-col gap-2">
-            <button [disabled]="personForm.invalid || isLoading" type="submit"
-              class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition shadow-lg">
+            <button [disabled]="isLoading" type="submit"
+              class="bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors">
               {{ isLoading ? 'Processing...' : (isEditMode ? 'Save Changes' : 'Add Nametag') }}
             </button>
             
