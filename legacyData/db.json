@@ -1,3 +1,7 @@
+
+//This used to be the "database" for the app. I changed it to postgres neon to modernized it 
+// and make it easier for users.
+
 {
   "persons": [
     {

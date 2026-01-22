@@ -19,4 +19,5 @@ model Person {
   age      Int?
 }
 
-//may use neon instead. Installed Prisma ORM
+//This is the ORM to replace full blown SQL to make it easier to handle the database.
+//It is used on a neon cloud database.

@@ -1,4 +1,4 @@
 export const environment = {
-   production: false,
+   production: true,
     personUrl: 'http://localhost:5000/api' 
 };
