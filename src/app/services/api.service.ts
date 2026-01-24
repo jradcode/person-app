@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+//import { lastValueFrom } from 'rxjs'; // Modern replacement for .toPromise()
 import { Observable } from 'rxjs';
 import { Person } from '../models/person';
 import { environment } from '../../environments/environment';
@@ -32,9 +33,9 @@ export class ApiService {
     return this.http.put<Person>(`${this.personUrl}/persons/${person.id}`, person);
   }
 
-  deletePerson(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.personUrl}/persons/${id}`);
+  deletePerson(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.personUrl}/persons/${id}`);
   }
- 
 }
+ 
 

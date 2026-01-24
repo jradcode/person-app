@@ -1,18 +1,26 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
-  // Signal to hold the message
   message = signal<string | null>(null);
-  // Signal to handle the type (success or error)
   type = signal<'success' | 'error'>('success');
+  
+  // A "computed" signal that updates whenever 'type' changes
+  colorClass = computed(() => 
+    this.type() === 'success' ? 'bg-green-500' : 'bg-red-500'
+  );
+
+  private timeoutId?: any;
 
   show(msg: string, type: 'success' | 'error' = 'success') {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
+
     this.message.set(msg);
     this.type.set(type);
     
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
+    this.timeoutId = setTimeout(() => {
       this.message.set(null);
     }, 3000);
   }

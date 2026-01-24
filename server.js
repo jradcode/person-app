@@ -2,11 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL  // ← Add this line!
-});
+const prisma = require('./db')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -156,7 +152,7 @@ app.delete('/api/persons/:id', async (req, res) => {
         });
 
         //Success - 204 No Content is standard for successful deletes
-        res.status(200).json({ message: "Nametag deleted successfully!" });
+        res.status(204).json({ message: "Nametag deleted successfully!" });
 
     } catch (err) {
         // Handle "Person not found" specifically
@@ -172,7 +168,7 @@ app.delete('/api/persons/:id', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'Production'}`);
 });
 
 //gracefully shuts down cloud database neon

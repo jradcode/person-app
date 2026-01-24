@@ -67,6 +67,7 @@ export class AddPersonFormComponent implements OnInit {
     }
   }
 
+  // This submits form
   submitForm() {
     if (this.personForm.invalid) {
       this.personForm.markAllAsTouched(); // Triggers red borders/messages
