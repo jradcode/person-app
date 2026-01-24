@@ -3,11 +3,11 @@
   
   <div class="w-full max-w-xs">
     <h1 class="text-3xl font-bold text-center py-3 text-slate-800">
-      {{ isEditMode ? 'Edit Nametag' : 'Add Nametag' }}
+      {{ isEditMode() ? 'Edit Nametag' : 'Add Nametag' }}
     </h1>
 
     <div class="flex justify-center items-center">
-      @if (isEditMode && isLoading && !personForm.get('fullName')?.value) {
+      @if (isEditMode() && isLoading() && !personForm.get('fullName')?.value) {
         <div class="flex flex-col items-center gap-4 py-10">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           <p class="text-slate-600">Fetching from Neon...</p>
@@ -17,28 +17,32 @@
               class="bg-white shadow-md rounded-xl px-8 pt-6 pb-8 mb-4 w-full border-4 border-slate-200">
           
           <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
-            <input formControlName="fullName" type="text" 
+            <label for="fullName" class="block text-gray-700 text-sm font-bold mb-2">Full Name</label>
+            <input id="fullName" 
+                   formControlName="fullName" 
+                   type="text" 
                    [class.border-red-500]="personForm.get('fullName')?.invalid && personForm.get('fullName')?.touched"
                    class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" 
                    placeholder="Enter full name..."/>
-            <!-- Shows fullname Validations -->
+            
             @if (personForm.get('fullName')?.touched && personForm.get('fullName')?.errors) {
               <div class="text-red-500 text-[10px] mt-1 italic">
                 @if (personForm.get('fullName')?.hasError('required')) { <span>Name is required.</span> }
-                @if (personForm.get('fullName')?.hasError('pattern')) { <span>Must start with a letter and contain no numbers and symbols.</span> }
+                @if (personForm.get('fullName')?.hasError('pattern')) { <span>Must start with a letter and contain no numbers.</span> }
                 @if (personForm.get('fullName')?.hasError('maxlength')) { <span>Limit 50 characters.</span> }
               </div>
             }
           </div>
 
           <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2">Age</label>
-            <input formControlName="age" type="number" 
+            <label for="age" class="block text-gray-700 text-sm font-bold mb-2">Age</label>
+            <input id="age" 
+                   formControlName="age" 
+                   type="number" 
                    [class.border-red-500]="personForm.get('age')?.invalid && personForm.get('age')?.touched"
                    class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500" 
                    placeholder="Enter age..."/>
-            <!-- shows age validations -->
+            
            @if (personForm.get('age')?.touched && personForm.get('age')?.errors) {
             <div class="text-red-500 text-[10px] mt-1 italic">
               @if (personForm.get('age')?.hasError('required')) { <span>Age is required.</span> }
@@ -49,13 +53,14 @@
           </div>
           
           <div class="flex flex-col gap-2">
-            <button [disabled]="isLoading" type="submit"
-              class="bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors">
-              {{ isLoading ? 'Processing...' : (isEditMode ? 'Save Changes' : 'Add Nametag') }}
+            <button [disabled]="isLoading() || personForm.invalid" 
+              type="submit"
+              class="bg-blue-500 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all">
+              {{ isLoading() ? 'Processing...' : (isEditMode() ? 'Save Changes' : 'Add Nametag') }}
             </button>
             
             <button type="button" (click)="cancel()" 
-                    class="w-full bg-gray-500 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full transition shadow">
+                    class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-full transition shadow-sm border border-gray-300">
               Cancel
             </button>
           </div>

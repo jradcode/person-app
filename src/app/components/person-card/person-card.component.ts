@@ -1,6 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core'; // Added OnInit
-import { Person } from '../../models/person';
-import { CommonModule } from '@angular/common'; 
+import { Component, OnInit, inject, signal } from '@angular/core'; // Added OnInit
+import { Person } from '../../models/person'; 
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service'; // 1. Import the Service
@@ -8,7 +7,7 @@ import { ToastService } from '../../services/toast.service'; // 1. Import the Se
 @Component({
   selector: 'app-person-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './person-card.component.html',
   styleUrl: './person-card.component.css'
 })
@@ -17,7 +16,8 @@ export class PersonCardComponent implements OnInit {
   private toast = inject(ToastService); //Inject the Global Toast Service
   private router = inject(Router);
 
-  personList: Person[] = [];
+  //using signals for list
+  personList = signal<Person[]>([]);
 
   ngOnInit(): void {
     this.onGetAllPersons();
@@ -25,21 +25,28 @@ export class PersonCardComponent implements OnInit {
   
   onGetAllPersons(): void {
     this.apiService.getAllPersons().subscribe({
-      next: (res) => this.personList = res,
-      error: (err) => console.error(err)
+      next: (res) => this.personList.set(res), // set signal
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Failed to load persons', 'error');
+      }
     });
   }
 
-  removeTag(personId: number): void {
+ removeTag(personId: number): void {
+    // delete confirmation
+    if (!confirm('You want to delete?')) return;
+
     this.apiService.deletePerson(personId).subscribe({
       next: () => {
-        this.personList = this.personList.filter(person => person.id !== personId);
+        // signal Update
+        this.personList.update(list => list.filter(p => p.id !== personId));
+        
         this.toast.show('Nametag Removed!', 'error'); 
-        console.log(`Person with Id ${personId} removed.`);
+        
         if (this.router.url.includes('details')) {
           this.router.navigate(['/']);
         }
-        
       },
       error: (err) => {
         console.error("Error removing person: ", err);
@@ -47,7 +54,6 @@ export class PersonCardComponent implements OnInit {
       }
     });
   }
-
   editTag(personId: number): void {
     // The Global Toast stays visible even after the page changes.
     this.toast.show('Opening Edit Form...', 'success');
