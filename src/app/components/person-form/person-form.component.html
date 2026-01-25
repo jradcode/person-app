@@ -1,30 +1,30 @@
 <div class="flex flex-col justify-center items-center min-h-[calc(100vh-160px)] bg-gray-50 px-4">
   <div class="w-full max-w-xs">
     
-    @if (isEditMode) {
-      <p class="text-center text-slate-400 font-mono text-[10px] mb-1">ID: {{ personId }}</p>
+    @if (isEditMode()) {
+      <p class="text-center text-slate-400 font-mono text-[10px] mb-1">ID: {{ personId() }}</p>
     }
     
     <h1 class="text-3xl font-bold text-center py-4 text-slate-800">
-      {{ isEditMode ? 'Edit Nametag' : 'Add Nametag' }}
+      {{ isEditMode() ? 'Edit Nametag' : 'Add Nametag' }}
     </h1>
 
     <div class="flex justify-center items-center">
-      <form [formGroup]="personForm" (ngSubmit)="submitForm()" 
+      <form [formGroup]="personForm" (ngSubmit)="submitForm()" novalidate
             class="bg-white shadow-xl rounded-2xl px-8 pt-6 pb-8 mb-4 w-full border-4 border-slate-200">
         
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="fullName">Full Name</label>
           <input formControlName="fullName" id="fullName" type="text"
-                 [class.border-red-500]="personForm.get('fullName')?.invalid && personForm.get('fullName')?.touched"
+                 [class.border-red-500]="f.fullName.invalid && f.fullName.touched"
                  class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500 transition-all" 
                  placeholder="Jane Doe"/>
           
-          @if (personForm.get('fullName')?.touched && personForm.get('fullName')?.invalid) {
+          @if (f.fullName.touched && f.fullName.invalid) {
             <div class="text-red-500 text-[10px] mt-1 italic">
-              @if (personForm.get('fullName')?.hasError('required')) { <span>Name is required.</span> }
-              @if (personForm.get('fullName')?.hasError('pattern')) { <span>Must start with a letter and contain no numbers and symbols.</span> }
-              @if (personForm.get('fullName')?.hasError('maxlength')) { <span>Max 50 characters.</span> }
+              @if (f.fullName.hasError('required')) { <span>Name is required.</span> }
+              @if (f.fullName.hasError('pattern')) { <span>Must start with a letter and contain no numbers and symbols.</span> }
+              @if (f.fullName.hasError('maxlength')) { <span>Max 50 characters.</span> }
             </div>
           }
         </div>
@@ -32,23 +32,23 @@
         <div class="mb-6">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="age">Age</label>
           <input formControlName="age" id="age" type="number"
-                 [class.border-red-500]="personForm.get('age')?.invalid && personForm.get('age')?.touched"
+                 [class.border-red-500]="f.age.invalid && f.age.touched"
                  class="shadow border rounded-lg w-full py-2 px-3 text-gray-700 focus:outline-blue-500 transition-all" 
                  placeholder="25"/>
           
-          @if (personForm.get('age')?.touched && personForm.get('age')?.invalid) {
+          @if (f.age.touched && f.age.invalid) {
             <div class="text-red-500 text-[10px] mt-1 italic">
-              @if (personForm.get('age')?.hasError('required')) { <span>Age is required.</span> }
-              @if (personForm.get('age')?.hasError('min')) { <span>Minimum age is 1.</span> }
-              @if (personForm.get('age')?.hasError('max')) { <span>Age must be 135 or below.</span> }
+              @if (f.age.hasError('required')) { <span>Age is required.</span> }
+              @if (f.age.hasError('min')) { <span>Minimum age is 1.</span> }
+              @if (f.age.hasError('max')) { <span>Age must be 135 or below.</span> }
             </div>
           }
         </div>
 
         <div class="flex flex-col gap-3">
-          <button [disabled]="isLoading" type="submit"
+          <button [disabled]="isLoading() || personForm.invalid" type="submit"
             class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors">
-            {{ isLoading ? 'Saving...' : (isEditMode ? 'Update Nametag' : 'Create Nametag') }}
+            {{ isLoading() ? 'Saving...' : (isEditMode() ? 'Update Nametag' : 'Create Nametag') }}
           </button>
           
           <button type="button" (click)="cancel()" class="w-full bg-gray-500 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-full transition shadow">

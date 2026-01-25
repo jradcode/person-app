@@ -1,15 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ApiService, PersonCreate } from '../../services/api.service';
 import { Person } from '../../models/person';
-import { CommonModule } from '@angular/common';
+// Removed CommonModule - Using Angular 19 Control Flow
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-person-form',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule], // CommonModule removed
   templateUrl: './person-form.component.html',
   styleUrls: ['./person-form.component.css']
 })
@@ -19,9 +19,10 @@ export class PersonFormComponent implements OnInit {
   private apiService = inject(ApiService);
   private toastService = inject(ToastService);
 
-  isEditMode = false;
-  personId: number | null = null;
-  isLoading = false;
+  // Converted to Signals for Angular 19 reactivity
+  isEditMode = signal(false);
+  personId = signal<number | null>(null);
+  isLoading = signal(false);
 
   // STRICT VALIDATIONS:
   // fullName: No numbers, no symbols, no 'only-spaces', max 50
@@ -42,13 +43,18 @@ export class PersonFormComponent implements OnInit {
     ])
   });
 
+  // Getter to simplify HTML access to controls
+  get f() {
+    return this.personForm.controls;
+  }
+
   ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       const id = Number(idParam);
-      this.isEditMode = true;
-      this.personId = id;
-      this.isLoading = true;
+      this.isEditMode.set(true);
+      this.personId.set(id);
+      this.isLoading.set(true);
 
       this.apiService.getPerson(id).subscribe({
         next: (data: any) => {
@@ -56,11 +62,11 @@ export class PersonFormComponent implements OnInit {
             fullName: data.fullName || data.full_name || '',
             age: data.age !== undefined ? data.age : null
           });
-          this.isLoading = false;
+          this.isLoading.set(false);
         },
         error: () => {
           this.toastService.show('Failed to load person', 'error');
-          this.isLoading = false;
+          this.isLoading.set(false);
         }
       });
     }
@@ -72,7 +78,7 @@ export class PersonFormComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     const rawValues = this.personForm.getRawValue();
     
     // Clean data: trim the name and ensure age is a number
@@ -81,18 +87,18 @@ export class PersonFormComponent implements OnInit {
       age: Number(rawValues.age) 
     };
 
-    const request$ = (this.isEditMode && this.personId !== null)
-      ? this.apiService.editPerson({ ...personData, id: this.personId })
+    const request$ = (this.isEditMode() && this.personId() !== null)
+      ? this.apiService.editPerson({ ...personData, id: this.personId()! })
       : this.apiService.addPerson(personData as PersonCreate);
 
     request$.subscribe({
       next: () => {
-        this.toastService.show(this.isEditMode ? 'Updated Successfully!' : 'Added Successfully!');
+        this.toastService.show(this.isEditMode() ? 'Updated Successfully!' : 'Added Successfully!');
         this.router.navigate(['/']);
       },
       error: () => {
         this.toastService.show('Submission failed', 'error');
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }
