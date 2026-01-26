@@ -7,6 +7,24 @@ const prisma = require('./db')
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+  'http://localhost:4200', // For local development
+  'https://jradcode.github.io' // Replace with your actual GitHub Pages URL
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error('CORS policy: This origin is not allowed'), false);
+    }
+    return callback(null, true);
+  }
+}));
+
+//ng build --base-href /person-app/         command to build
+
 // Middleware
 app.use(helmet());
 app.use(cors({ origin: 'http://localhost:4200' }));

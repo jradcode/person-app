@@ -1,4 +1,4 @@
 export const environment = {
 	production: true,
-	personUrl: "http://localhost:5000/api"
+	personUrl: "http://localhost:5000/api" //change this for render
 };

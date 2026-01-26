@@ -12,7 +12,8 @@ export type PersonCreate = Omit<Person, 'id'>;
   providedIn: 'root'
 })
 export class ApiService {
-  private personUrl = environment.personUrl;
+  // Ensure this is "https://your-api.com/api"
+  private readonly personUrl = environment.personUrl;
   private http = inject(HttpClient);
 
   //turn these calls into a Promise
@@ -33,8 +34,8 @@ export class ApiService {
     return this.http.put<Person>(`${this.personUrl}/persons/${person.id}`, person);
   }
 
-  deletePerson(id: number): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.personUrl}/persons/${id}`);
+  deletePerson(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.personUrl}/persons/${id}`);
   }
 }
  
