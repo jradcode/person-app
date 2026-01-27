@@ -1,4 +1,4 @@
 export const environment = {
-	production: true,
-	personUrl: "http://localhost:5000/api" //change this for render
+    production: true,
+    personUrl: 'https://person-app-backend-3gnl.onrender.com/api' // Added /api
 };
