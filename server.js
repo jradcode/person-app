@@ -40,7 +40,9 @@ app.get('/api/persons', async (req, res) => {
         const persons = await prisma.person.findMany({
             orderBy: { id: 'asc' } 
         });
+        
         res.json(persons); 
+       
     } catch (err) {
         // Log the actual error to your terminal so you can see what went wrong
         console.error("GET /api/persons error:", err);
@@ -48,11 +50,13 @@ app.get('/api/persons', async (req, res) => {
     }
 });
 
+// Get one person or nametag by it's id and if it failed there's an error
 // Get one person by ID
 app.get('/api/persons/:id', async (req, res) => {
     const { id } = req.params;
     const personId = parseInt(id);
 
+    // Ensure ID is a number
     if (isNaN(personId)) {
         return res.status(400).json({ error: "Invalid ID" });
     }
@@ -62,12 +66,14 @@ app.get('/api/persons/:id', async (req, res) => {
             where: { id: personId }
         });
 
+        // Not Found Handling
         if (!person) {
             return res.status(404).json({ error: "Nametag not found." });
         }
 
         res.json(person);
     } catch (err) {
+        // Log error internally, send generic message to user for security reasons
         console.error("Database Error:", err); 
         res.status(500).json({ error: "Internal Server Error." });
     }
@@ -76,19 +82,16 @@ app.get('/api/persons/:id', async (req, res) => {
 // Create a new person (The "Add" functionality)
 app.post('/api/persons', async (req, res) => {
     try {
-        const { firstName, lastName, email } = req.body;
-        
-        if (!firstName || !lastName || !email) {
-            return res.status(400).json({ error: "Missing required fields." });
-        }
-
+        const { fullName, age } = req.body;
         const newPerson = await prisma.person.create({
-            data: { firstName, lastName, email }
+            data: { 
+                fullName, 
+                age: parseInt(age) 
+            }
         });
-
         res.status(201).json(newPerson);
     } catch (err) {
-        console.error("POST /api/persons error:", err);
+        console.error("POST Error:", err);
         res.status(500).json({ error: "Internal Server Error." });
     }
 });
@@ -97,14 +100,17 @@ app.post('/api/persons', async (req, res) => {
 app.put('/api/persons/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const { firstName, lastName, email } = req.body;
-        const updated = await prisma.person.update({
+        const { fullName, age } = req.body;
+        const updatedPerson = await prisma.person.update({
             where: { id: parseInt(id) },
-            data: { firstName, lastName, email }
+            data: { 
+                fullName, 
+                age: parseInt(age) 
+            }
         });
-        res.json(updated);
+        res.json(updatedPerson);
     } catch (err) {
-        console.error("PUT error:", err);
+        console.error("PUT Error:", err);
         res.status(500).json({ error: "Internal Server Error." });
     }
 });
@@ -118,7 +124,7 @@ app.delete('/api/persons/:id', async (req, res) => {
         });
         res.status(204).send();
     } catch (err) {
-        console.error("DELETE error:", err);
+        console.error("DELETE Error:", err);
         res.status(500).json({ error: "Internal Server Error." });
     }
 });
