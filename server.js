@@ -76,3 +76,10 @@ app.get('/api/persons/:id', async (req, res) => {
         // Log error internally, send generic message to user for security reasons
         console.error("Database Error:", err); 
         res.status(500).json({ error: "Internal Server Error." });
+        }
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
