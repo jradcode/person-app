@@ -1,0 +1,67 @@
+{
+  "hash": "4e46a1f2",
+  "configHash": "0079f0a0",
+  "lockfileHash": "2e1e21a1",
+  "browserHash": "f6f672bc",
+  "optimized": {
+    "@angular/common": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "525c7d35",
+      "needsInterop": false
+    },
+    "@angular/common/http": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "54fee98c",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "80d6856f",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "ab820f6c",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "ff1fb4fd",
+      "needsInterop": false
+    },
+    "@angular/router": {
+      "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
+      "file": "@angular_router.js",
+      "fileHash": "69817f2a",
+      "needsInterop": false
+    },
+    "@angular/core/rxjs-interop": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/rxjs-interop.mjs",
+      "file": "@angular_core_rxjs-interop.js",
+      "fileHash": "43b0b566",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-YOHIZJMS": {
+      "file": "chunk-YOHIZJMS.js"
+    },
+    "chunk-4ZRUK5IR": {
+      "file": "chunk-4ZRUK5IR.js"
+    },
+    "chunk-KMK7HFQ2": {
+      "file": "chunk-KMK7HFQ2.js"
+    },
+    "chunk-SIU2L5GO": {
+      "file": "chunk-SIU2L5GO.js"
+    },
+    "chunk-JK4ENCRN": {
+      "file": "chunk-JK4ENCRN.js"
+    }
+  }
+}
