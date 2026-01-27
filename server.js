@@ -32,6 +32,11 @@ app.use(helmet({
 }));
 app.use(express.json({ limit: '10kb' })); // Limits total request size
 
+// Add this so the root URL doesn't show an error
+app.get('/', (req, res) => {
+    res.send('Backend is up and running!');
+});
+
 // Routes
 
 // Get all persons or nametags and display error if failure
