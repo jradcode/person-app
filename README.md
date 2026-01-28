@@ -27,4 +27,4 @@ A streamlined full-stack application for managing digital "Nametags." This proje
    
    You can view and use the app at:
    
-   https://jradcode.github.io/person-app/
+   [Visit person-app](https://jradcode.github.io/person-app/)
