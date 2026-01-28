@@ -22,3 +22,9 @@ A streamlined full-stack application for managing digital "Nametags." This proje
 1. **Clone the repo:**
    ```bash
    git clone [https://github.com/jradcode/person-app.git](https://github.com/jradcode/person-app.git)
+
+   OR
+   
+   You can view and use the app at:
+   
+   https://jradcode.github.io/person-app/
